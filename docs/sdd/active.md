@@ -17,6 +17,8 @@ Uma API autoriza pagamentos com idempotência, grava pagamento e evento outbox n
 3. Worker concorrente, Kafka, retries e evidência idempotente.
 4. Angular, contêineres, CI, manifests e documentação operacional.
 
+Todos os incrementos foram concluídos e validados. Mudanças futuras devem abrir um novo SDD ou atualizar este resultado antes da implementação.
+
 ## Restrições
 
 - Java 21, Quarkus 3.33 LTS e Gradle Wrapper.

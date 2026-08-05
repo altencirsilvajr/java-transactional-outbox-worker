@@ -16,12 +16,14 @@ class PaymentResourceTest {
         given()
                 .contentType(ContentType.JSON)
                 .header("Idempotency-Key", "checkout-001")
+                .header("X-Correlation-ID", "contract-test")
                 .body("""
                         {"amount":42.00,"currency":"brl"}
                         """)
                 .when().post("/api/payments")
                 .then()
                 .statusCode(201)
+                .header("X-Correlation-ID", "contract-test")
                 .body("currency", equalTo("BRL"))
                 .body("outboxStatus", equalTo("PENDING"));
 

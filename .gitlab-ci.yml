@@ -1,0 +1,22 @@
+image: eclipse-temurin:21-jdk
+
+stages: [test, frontend]
+
+backend:
+  stage: test
+  services:
+    - docker:27-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  script:
+    - ./gradlew test --no-daemon
+    - ./scripts/audit-history.sh
+
+frontend:
+  stage: frontend
+  image: node:24-bookworm-slim
+  script:
+    - npm --prefix frontend ci
+    - npm --prefix frontend run test:ci
+    - npm --prefix frontend run build

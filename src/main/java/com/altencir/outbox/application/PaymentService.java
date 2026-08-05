@@ -27,8 +27,11 @@ public class PaymentService {
 
     @Transactional
     public AuthorizationResult authorize(String requestKey, CreatePaymentRequest request) {
+        if (request == null) {
+            throw new DomainValidationException("Payment body is required.");
+        }
         var normalizedKey = validateKey(requestKey);
-        var amount = request.amount() == null ? null : request.amount().setScale(2, RoundingMode.UNNECESSARY);
+        var amount = normalizeAmount(request);
         var currency = normalizeCurrency(request.currency());
         if (amount == null || amount.signum() <= 0) {
             throw new DomainValidationException("Payment amount must be greater than zero.");
@@ -65,6 +68,17 @@ public class PaymentService {
         payment.persist();
         message.persist();
         return new AuthorizationResult(toResponse(payment, message, false), true);
+    }
+
+    private java.math.BigDecimal normalizeAmount(CreatePaymentRequest request) {
+        if (request.amount() == null) {
+            return null;
+        }
+        try {
+            return request.amount().setScale(2, RoundingMode.UNNECESSARY);
+        } catch (ArithmeticException exception) {
+            throw new DomainValidationException("Payment amount must have at most two decimal places.");
+        }
     }
 
     private String validateKey(String key) {

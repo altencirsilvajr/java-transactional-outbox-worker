@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/altencirsilvajr/java-transactional-outbox-worker/contracts/payment-authorized.v1.schema.json",
+  "title": "PaymentAuthorized.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "paymentId", "amount", "currency", "authorizedAt", "idempotencyKey"],
+  "properties": {
+    "schemaVersion": { "const": "1" },
+    "paymentId": { "type": "string", "format": "uuid" },
+    "amount": { "type": "number", "exclusiveMinimum": 0, "multipleOf": 0.01 },
+    "currency": { "type": "string", "pattern": "^[A-Z]{3}$" },
+    "authorizedAt": { "type": "string", "format": "date-time" },
+    "idempotencyKey": { "type": "string", "minLength": 1, "maxLength": 180 }
+  }
+}

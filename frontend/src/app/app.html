@@ -1,0 +1,43 @@
+<main>
+  <header>
+    <div>
+      <p class="eyebrow">LABORATÓRIO JAVA SÊNIOR</p>
+      <h1>Transactional Outbox</h1>
+      <p class="lead">Observe a autorização, o claim do worker, o retry e a evidência idempotente no Kafka.</p>
+    </div>
+    <button class="secondary" type="button" (click)="refresh()">Atualizar estado</button>
+  </header>
+
+  <section class="panel actions">
+    <form [formGroup]="form" (ngSubmit)="authorize()">
+      <label>Valor <input type="number" step="0.01" formControlName="amount" /></label>
+      <label>Moeda <input maxlength="3" formControlName="currency" /></label>
+      <button type="submit" [disabled]="loading() || form.invalid">Autorizar pagamento</button>
+    </form>
+    <button class="danger" type="button" (click)="failNext()">Falhar próxima publicação</button>
+  </section>
+
+  @if (notice()) { <p class="notice">{{ notice() }}</p> }
+
+  <section class="cards" aria-label="Resumo operacional">
+    <article><span>Pagamentos</span><strong>{{ snapshot().payments.length }}</strong></article>
+    <article><span>Pendentes</span><strong>{{ (snapshot().messages | filterStatus:'PENDING').length }}</strong></article>
+    <article><span>Publicados</span><strong>{{ (snapshot().messages | filterStatus:'PUBLISHED').length }}</strong></article>
+    <article><span>Consumidos</span><strong>{{ snapshot().consumedEvents.length }}</strong></article>
+  </section>
+
+  <section class="timeline">
+    <h2>Outbox real</h2>
+    @for (message of snapshot().messages; track message.id) {
+      <article class="message" [class.published]="message.status === 'PUBLISHED'" [class.failed]="message.status === 'FAILED'">
+        <div class="message-head"><strong>{{ message.eventType }}</strong><span>{{ message.status }}</span></div>
+        <dl>
+          <dt>Chave</dt><dd>{{ message.idempotencyKey }}</dd>
+          <dt>Tentativas</dt><dd>{{ message.attemptCount }}</dd>
+          <dt>Próxima tentativa</dt><dd>{{ message.nextAttemptAt | date:'medium' }}</dd>
+          <dt>Último erro</dt><dd>{{ message.lastError || '—' }}</dd>
+        </dl>
+      </article>
+    } @empty { <p class="empty">Autorize um pagamento para iniciar o fluxo.</p> }
+  </section>
+</main>
