@@ -9,15 +9,15 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
           cache: gradle
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: '24'
           cache: npm
@@ -26,6 +26,8 @@ jobs:
         run: ./gradlew test --no-daemon
       - name: Frontend install
         run: npm --prefix frontend ci
+      - name: Frontend dependency audit
+        run: npm --prefix frontend audit --audit-level=moderate
       - name: Frontend tests
         run: npm --prefix frontend run test:ci
       - name: Frontend build
